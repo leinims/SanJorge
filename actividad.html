@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evento Día de San Jorge</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet"> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    
+    <nav>
+        <div class="nav-button"><a href="index.html">⚒ Mapa</a></div>
+        <div class="nav-button"><a href="resultados.html">⚔ Resultados</a></div>
+    </nav>
+
+    <div id="app">
+        <div id="activity-container">
+            <div id="activity-modal">
+                <div id="activity-name">⧰ {{actividad}}</div>
+                <div id="activity-material">
+                    <strong>Materiales:</strong>
+                    <ul>
+                        <li v-for="item in materiales">⛉ {{item}}</li>
+                    </ul>
+                </div>
+                
+                <a id="link-reu" href="#">Ir a la reunión</a>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="character-container">
+        <div id="character-info">
+            <div class="group-info main-info">
+                <div id="avatar-img">
+                    <img src="images\avatars\avatar1.png" alt="">
+                </div>
+                <div id="nickname-info">Jorge Caballero</div>
+                <div id="kingdom-info"><strong>Reino:</strong> 999 Mafeking</div>
+            </div>
+            <div class="group-info skills-info">
+                <div id="strength-info">Fuerza: <progress id="skill1" max="100" value="80"> 70% </progress></div>
+                <div id="dexterity-info">Destreza: <progress id="skill2" max="100" value="60"> 70% </progress></div>
+                <div id="intelligence-info">Inteligencia: <progress id="skill3" max="100" value="60"> 70% </progress></div>
+                <div id="wisdom-info">Sabiduría: <progress id="skill4" max="100" value="30"> 30% </progress></div>
+                <div id="charisma-info">Carisma: <progress id="skill5" max="100" value="90"> 70% </progress></div>
+            </div>
+
+            <div id="level-info">
+                <img src="images\grades\comandante.png" alt="">
+                <div id="level-desc"><strong>Rango: </strong>Cadete</div>
+            </div>
+
+        </div>
+    </div>
+
+    
+
+    <script src="https://unpkg.com/vue"></script>
+    <script>
+        var base = localStorage.getItem("base");
+        const app = new Vue({
+            el: '#app',
+            data: {
+                sheetList: [],
+                actividad: '',
+                materiales: [],
+                link: ''
+            },
+            created() {
+        fetch('https://spreadsheets.google.com/feeds/cells/1GDEnzPOAUYwctoavEAdBRWbG_z8Nb0-nH7ErqRwvMeQ/od6/public/basic?alt=json')
+             .then(response => response.json())
+             .then(json=> {
+                 var data = json.feed.entry;
+                 var arrTmp = []
+                 data.forEach((item, index, arr) => {
+                    indice = index+1;
+                    if(indice <= 4) return;
+                    arrTmp.push(item.content['$t']);
+                    if((indice)%4==0) {
+                        this.sheetList.push(arrTmp)
+                        arrTmp = []
+                    }
+                });
+
+                var index = this.sheetList.findIndex(item=> {
+                    return item[0]==base;
+                });
+                if (index==-1) {
+                    alert('No se encontró la actividad asociado')
+                } else {
+                    var activTmp = this.sheetList[index]
+                    this.actividad = activTmp[1]
+                    this.materiales = activTmp[3].split(',')
+                    this.link = activTmp[2]
+                }
+                document.getElementById("link-reu").href=this.link
+                 
+             })   
+            }
+        });
+        
+    
+    </script>
+
+    <script src="scripts\main.js"></script>
+    
+</body>
+</html>

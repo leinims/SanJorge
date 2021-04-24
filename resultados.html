@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evento Día de San Jorge</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet"> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    
+    <nav>
+        <div class="nav-button"><a href="index.html">⚒ Mapa</a></div>
+        <div class="nav-button"><a href="resultados.html">⚔ Resultados</a></div>
+    </nav>
+
+    <div id="app">
+        <div id="login-modal" style="height: auto;">
+            <h2>Resultados</h2>
+            <ul>
+                <li v-for="item in sheetList">{{item[4]}}: {{item[11]}} %  </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                sheetList: []
+            },
+            created() {
+             fetch('https://spreadsheets.google.com/feeds/cells/1JK8x9W_4drsAil3YUSIAMJXzIXCBTfX6PufSQ5k2tVA/od6/public/basic?alt=json')
+             .then(response => response.json())
+             .then(json=> {
+                 var data = json.feed.entry;
+                 var arrTmp = []
+                 data.forEach((item, index, arr) => {
+                    indice = index+1;
+                    if(indice <= 12) return;
+                    arrTmp.push(item.content['$t']);
+                    if((indice)%12==0) {
+                        this.sheetList.push(arrTmp)
+                        arrTmp = []
+                    }
+                });
+                localStorage.setItem("sheetList", JSON.stringify(this.sheetList));
+
+                 
+             })   
+            }
+        });
+        
+    
+    </script>
+
+    <script src="scripts\main.js"></script>
+</body>
+</html>
